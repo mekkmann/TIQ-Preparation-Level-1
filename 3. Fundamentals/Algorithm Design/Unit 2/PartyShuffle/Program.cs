@@ -25,7 +25,8 @@ namespace PartyShuffle
             static List<string> ShuffleList(List<string> items)
             {
                 Random random = new();
-                List<string> itemsCopy = items;
+                List<string> itemsCopy = new(items);
+               
                 int copyCount = itemsCopy.Count;
 
                 for (int i = copyCount - 1; i > 0; i--)
