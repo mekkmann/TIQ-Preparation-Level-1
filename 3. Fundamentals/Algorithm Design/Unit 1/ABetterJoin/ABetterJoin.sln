@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34622.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ABetterJoin", "ABetterJoin.csproj", "{0F5FBC26-BC4E-487A-AD58-A65A5E0B2C30}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0F5FBC26-BC4E-487A-AD58-A65A5E0B2C30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F5FBC26-BC4E-487A-AD58-A65A5E0B2C30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F5FBC26-BC4E-487A-AD58-A65A5E0B2C30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F5FBC26-BC4E-487A-AD58-A65A5E0B2C30}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BD8C7E69-429C-49B7-99A8-60774A00CAF0}
+	EndGlobalSection
+EndGlobal
