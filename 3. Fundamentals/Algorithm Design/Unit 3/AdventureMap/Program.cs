@@ -15,26 +15,22 @@
                 {
                     for (int x = 0; x < width; x++)
                     {
-                        //Border Corners
-                        if (x == 0 && y == 0 ||
-                            x == width - 1 && y == height - 1 ||
-                            x == 0 && y == height - 1 ||
-                            x == width - 1 && y == 0
-                            )
+                        //Border
+                        bool verticalBorder = x == 0 || x == width - 1;
+                        bool horizontalBorder = y == 0 || y == height - 1;
+                        if (verticalBorder && horizontalBorder)
                         {
                             Console.ForegroundColor = ConsoleColor.Yellow;
                             Console.Write("+");
                             continue;
                         }
-                        //Vertical Borders
-                        if (x == 0 && y != 0 || x == width - 1 && y != height - 1)
+                        if (verticalBorder)
                         {
                             Console.ForegroundColor = ConsoleColor.Yellow;
                             Console.Write("|");
                             continue;
                         }
-                        //Horizontal Borders
-                        if (y == 0 && x != 0 || y == height - 1 && x != width - 1)
+                        if (horizontalBorder)
                         {
                             Console.ForegroundColor = ConsoleColor.Yellow;
                             Console.Write("-");
@@ -42,19 +38,16 @@
                         }
 
                         //Forest
-                        if (x <= (width - 1) / 4 && random.NextDouble() < 0.5)
+                        if (x <= width / 4 && random.NextDouble() < 0.5)
                         {
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.Write("T");
                             continue;
                         }
 
-                        // no conditions met
+                        // no conditions met, draw ground
                         Console.ForegroundColor = ConsoleColor.DarkMagenta;
                         Console.Write("l");
-
-
-
                     }
                     //end of row
                     Console.WriteLine();
