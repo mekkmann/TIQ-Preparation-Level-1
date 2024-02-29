@@ -1,16 +1,27 @@
-﻿namespace AdventureMap
+﻿using System.Numerics;
+using System.Reflection.Metadata.Ecma335;
+using System.Security.Cryptography;
+
+namespace AdventureMap
 {
     internal class Program
     {
         static void Main(string[] args)
         {
-            Map(40, 20);
+            Map(60, 20, "Adventure Map");
 
             // to keep console open
             Console.ReadLine();
-            static void Map(int width, int height)
+            static void Map(int width, int height, string title)
             {
                 Random random = new();
+
+                //Helper Variables
+                Vector2 titleStart = GenerateTitleStartPosition(width, title);
+                Vector2 horizontalPathStart = GenerateRandomHorizontalPathStart(height);
+                int endOfFirstQuarter = width / 4;
+                int startOfLastQuarter = endOfFirstQuarter * 3 - 1;
+
                 for (int y = 0; y < height; y++)
                 {
                     for (int x = 0; x < width; x++)
@@ -18,27 +29,35 @@
                         //Border
                         bool verticalBorder = x == 0 || x == width - 1;
                         bool horizontalBorder = y == 0 || y == height - 1;
+
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        
                         if (verticalBorder && horizontalBorder)
                         {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
                             Console.Write("+");
                             continue;
                         }
                         if (verticalBorder)
                         {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
                             Console.Write("|");
                             continue;
                         }
                         if (horizontalBorder)
                         {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
                             Console.Write("-");
                             continue;
                         }
 
+                        //Title
+                        if (x == titleStart.X && y == titleStart.Y)
+                        {
+                            Console.Write(title);
+                            x += title.Length - 1;
+                            continue;
+                        }
+
                         //Forest
-                        if (x <= width / 4 && random.NextDouble() < 0.5)
+                        if (x <= endOfFirstQuarter && random.NextDouble() < 0.5)
                         {
                             Console.ForegroundColor = ConsoleColor.Green;
                             Console.Write("T");
@@ -51,6 +70,20 @@
                     }
                     //end of row
                     Console.WriteLine();
+                }
+
+                static Vector2 GenerateTitleStartPosition(int width, string title, int yStart = 1)
+                {
+                    int titleLength = title.Length;
+                    int x = (width - titleLength) / 2;
+                    return new Vector2(x, yStart);
+                }
+
+                static Vector2 GenerateRandomHorizontalPathStart(int height)
+                {
+                    Random random = new();
+                    int y = random.Next(2, height - 2);
+                    return new Vector2(1, y);
                 }
             }
         }
