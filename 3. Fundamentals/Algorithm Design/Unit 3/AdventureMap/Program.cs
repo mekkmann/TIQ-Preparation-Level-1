@@ -21,6 +21,7 @@ namespace AdventureMap
                 Vector2 horizontalPathStart = GenerateRandomHorizontalPathStart(height);
                 int endOfFirstQuarter = width / 4;
                 int startOfLastQuarter = endOfFirstQuarter * 3 - 1;
+                List<string> treeSymbols = ["T", "@", "%", ")", "("];
 
                 for (int y = 0; y < height; y++)
                 {
@@ -57,11 +58,31 @@ namespace AdventureMap
                         }
 
                         //Forest
-                        if (x <= endOfFirstQuarter && random.NextDouble() < 0.5)
+                        if (x <= endOfFirstQuarter)
                         {
-                            Console.ForegroundColor = ConsoleColor.Green;
-                            Console.Write("T");
-                            continue;
+                            bool writeSymbol = false;
+                            double randomDouble = random.NextDouble();
+                            if (x >= endOfFirstQuarter / 3 * 2 && randomDouble < 0.3f)
+                            {
+                                writeSymbol = true;
+
+                            }
+                            if (x <= endOfFirstQuarter/3 * 2 && randomDouble < 0.5f)
+                            {
+                                writeSymbol = true;
+
+                            }
+                            if (x <= endOfFirstQuarter/3 && randomDouble < 0.9f)
+                            {
+                                writeSymbol = true;
+                            }
+                            if (writeSymbol)
+                            {
+                                string randomTreeSymbol = treeSymbols[random.Next(treeSymbols.Count)];
+                                Console.ForegroundColor= ConsoleColor.Green;
+                                Console.Write(randomTreeSymbol);
+                                continue;
+                            }
                         }
 
                         // no conditions met, draw ground
