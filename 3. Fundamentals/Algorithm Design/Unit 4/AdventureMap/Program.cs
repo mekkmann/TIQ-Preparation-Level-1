@@ -22,6 +22,7 @@ namespace AdventureMap
                 List<string> treeSymbols = ["T", "@", "%", ")", "("];
                 Vector2 titleStart = GenerateTitleStartPosition(width, title);
                 List<int> riverStart = GenerateRiverStart(height, startOfLastQuarter);
+                List<int> horizontalPathY = GenerateHorizontalPathY(height, width, riverStart);
 
 
                 
@@ -49,6 +50,23 @@ namespace AdventureMap
                         if (horizontalBorder)
                         {
                             Console.Write("-");
+                            continue;
+                        }
+                        //Bridge Railings
+                        if ((y == horizontalPathY[x] - 1 || y == horizontalPathY[x] + 1) && x > riverStart[horizontalPathY[x]] - 3 && x < riverStart[horizontalPathY[x]] + 5)
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkGray;
+                            Console.Write("=");
+                            continue;
+                        }
+
+
+                        //HorizontalPath
+                        if (y == horizontalPathY[x])
+                        {
+
+                            Console.ForegroundColor = ConsoleColor.Gray;
+                            Console.Write("#");
                             continue;
                         }
 
@@ -113,8 +131,7 @@ namespace AdventureMap
                         }
 
                         // no conditions met, draw ground
-                        Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                        Console.Write("l");
+                        Console.Write(" ");
                     }
                     //end of row
                     Console.WriteLine();
@@ -148,6 +165,36 @@ namespace AdventureMap
                     }
 
                     return riverStart;
+                }
+
+                static List<int> GenerateHorizontalPathY(int height, int width, List<int> riverStart)
+                {
+                    Random random = new();
+                    List<int> horizontalPathY = [];
+
+                    int currentPathStepY = height / 2;
+
+                    for (int x = 0; x < width; x++)
+                    {
+                        horizontalPathY.Add(currentPathStepY);
+
+                        // if within map bounds and NOT on river 
+                        if ((currentPathStepY - 1 >= 1 || currentPathStepY <= height - 1) && (x < riverStart[currentPathStepY] - 2 || x > riverStart[currentPathStepY] + 6))
+                        {
+                            int direction = random.Next(6);
+                            if (direction == 0)
+                            {
+                                currentPathStepY--;
+                            }
+                            if (direction == 2)
+                            {
+                                currentPathStepY++;
+                            }
+
+                        }
+                    }
+
+                    return horizontalPathY;
                 }
             }
         }
