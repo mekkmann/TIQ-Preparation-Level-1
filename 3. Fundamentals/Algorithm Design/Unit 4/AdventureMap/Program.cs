@@ -1,6 +1,4 @@
 ﻿using System.Numerics;
-using System.Reflection.Metadata.Ecma335;
-using System.Security.Cryptography;
 
 namespace AdventureMap
 {
@@ -8,11 +6,12 @@ namespace AdventureMap
     {
         static void Main(string[] args)
         {
-            Map(75, 20, "Adventure Map");
-            Map(60, 20, "Adventure Map");
-            Map(40, 20, "Adventure Map");
-            Map(20, 20, "Adventure Map");
+            //Map(75, 20, "Adventure Map");
+            //Map(60, 20, "Adventure Map");
+            //Map(40, 20, "Adventure Map");
+            //Map(20, 20, "Adventure Map");
             Map(20, 10, "Adventure Map");
+            Map(30, 10, "Adventure Map");
 
             // to keep console open
             Console.ReadLine();
@@ -57,6 +56,13 @@ namespace AdventureMap
                             Console.Write("-");
                             continue;
                         }
+                        //Title
+                        if (x == titleStart.X && y == titleStart.Y)
+                        {
+                            Console.Write(title);
+                            x += title.Length - 1;
+                            continue;
+                        }
 
                         //Bridge Railings
                         if ((y == horizontalPathY[x] - 1 || y == horizontalPathY[x] + 1) && x > riverStart[horizontalPathY[x]] - 3 && x < riverStart[horizontalPathY[x]] + 5)
@@ -69,7 +75,6 @@ namespace AdventureMap
                         //HorizontalPath
                         if (y == horizontalPathY[x])
                         {
-
                             Console.ForegroundColor = ConsoleColor.Gray;
                             Console.Write("#");
                             continue;
@@ -117,13 +122,6 @@ namespace AdventureMap
                         }
 
 
-                        //Title
-                        if (x == titleStart.X && y == titleStart.Y)
-                        {
-                            Console.Write(title);
-                            x += title.Length - 1;
-                            continue;
-                        }
 
                         //Forest
                         if (x <= endOfFirstQuarter)
