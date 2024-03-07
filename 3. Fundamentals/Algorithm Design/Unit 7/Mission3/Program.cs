@@ -2,50 +2,124 @@
 {
     internal class Program
     {
+        //static void Main(string[] args)
+        //{
+        //    var data = new List<int>();
+        //    var random = new Random();
+
+        //    //for (int i = 0; i < 70; i++)
+        //    //{
+        //    //    data.Add(random.Next(20));
+        //    //    DisplayData(data);
+        //    //}
+        //    for (int i = 0; i < 30; i++)
+        //    {
+        //        data.Add(random.Next(20));
+        //        DisplayData(data);
+        //    }
+
+        //    // Bubble sort
+
+        //    // Go through the list number by number and compare it to its next neighbor.
+        //    // If the next neighbor is smaller than the previous one, swap them!
+        //    // Continue until we reach the end.
+        //    // Each time we go through the list, the highest neighbor will 'bubble' to the end.
+        //    // This means we have to sort a smaller and smaller part of the list as we go on.
+        //    // We'll decrease our sorting range one by one until the whole list is sorted.
+        //    for (int sortingRange = data.Count; sortingRange > 0; sortingRange--)
+        //    {
+        //        // Now we go from the start of the list to the end of the sorting range.
+        //        for (int i = 0; i < sortingRange - 1; i++)
+        //        {
+        //            // Look at the next neighbor and see if it's smaller.
+        //            if (data[i + 1] < data[i])
+        //            {
+        //                // It is smaller! We need to switch them.
+        //                (data[i], data[i + 1]) = (data[i + 1], data[i]);
+        //            }
+
+        //            // Display data for diagnostic purposes.
+        //            DisplayData(data);
+        //        }
+        //    }
+
+        //    // to keep console open
+        //    Console.ReadLine();
+        //}
         static void Main(string[] args)
         {
             var data = new List<int>();
             var random = new Random();
 
-            //for (int i = 0; i < 70; i++)
-            //{
-            //    data.Add(random.Next(20));
-            //    DisplayData(data);
-            //}
-            for (int i = 0; i < 30; i++)
+            for (int i = 0; i < 70; i++)
             {
                 data.Add(random.Next(20));
                 DisplayData(data);
             }
 
-            // Bubble sort
 
-            // Go through the list number by number and compare it to its next neighbor.
-            // If the next neighbor is smaller than the previous one, swap them!
-            // Continue until we reach the end.
-            // Each time we go through the list, the highest neighbor will 'bubble' to the end.
-            // This means we have to sort a smaller and smaller part of the list as we go on.
-            // We'll decrease our sorting range one by one until the whole list is sorted.
-            for (int sortingRange = data.Count; sortingRange > 0; sortingRange--)
+            // Merge sort
+
+            // Divide a list into two halves. First, sort each half separately.
+            // Merge the sorted halves together by choosing the smallest number from one of the two lists.
+            // Continue choosing until you've used all numbers from both lists.
+            // We start the sort by simply trying to sort the full list.
+            SortSublist(data, 0, data.Count - 1);
+
+            // Display data for diagnostic purposes.
+            DisplayData(data);
+        }
+
+        static void SortSublist(List<int> data, int startIndex, int endIndex)
+        {
+            // If our list has one element or less, the sublist is already sorted.
+            if (startIndex >= endIndex)
+                return;
+
+            // Split the list in half.
+            int middleIndex = (startIndex + endIndex) / 2;
+
+            // Sort left half.
+            SortSublist(data, startIndex, middleIndex);
+
+            // Sort right half.
+            SortSublist(data, middleIndex + 1, endIndex);
+
+            // Merge both lists together into a temporary list.
+            int leftSublistIndex = startIndex;
+            int rightSublistIndex = middleIndex + 1;
+            var mergedList = new List<int>();
+
+            while (leftSublistIndex <= middleIndex || rightSublistIndex <= endIndex)
             {
-                // Now we go from the start of the list to the end of the sorting range.
-                for (int i = 0; i < sortingRange - 1; i++)
+                // See if the number from the left side is smaller, or if there are no numbers left on the right.
+                if (rightSublistIndex > endIndex || leftSublistIndex <= middleIndex && data[leftSublistIndex] < data[rightSublistIndex])
                 {
-                    // Look at the next neighbor and see if it's smaller.
-                    if (data[i + 1] < data[i])
-                    {
-                        // It is smaller! We need to switch them.
-                        (data[i], data[i + 1]) = (data[i + 1], data[i]);
-                    }
-
-                    // Display data for diagnostic purposes.
-                    DisplayData(data);
+                    // Add the left number to the merged list.
+                    mergedList.Add(data[leftSublistIndex]);
+                    leftSublistIndex++;
                 }
+                else
+                {
+                    // Add the right number to the merged list.
+                    mergedList.Add(data[rightSublistIndex]);
+                    rightSublistIndex++;
+                }
+
+                // Display data for diagnostic purposes.
+                DisplayData(data);
             }
 
-            // to keep console open
-            Console.ReadLine();
+            // Place numbers from the temporary list back into the main list.
+            for (int i = 0; i < mergedList.Count; i++)
+            {
+                data[startIndex + i] = mergedList[i];
+
+                // Display data for diagnostic purposes.
+                DisplayData(data);
+            }
         }
+
         static void DisplayData(List<int> data)
         {
             Console.CursorVisible = false;
