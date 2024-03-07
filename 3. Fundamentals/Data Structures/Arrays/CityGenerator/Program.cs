@@ -63,8 +63,9 @@
                             bool down = roads[j, i + 1];
                             bool left = roads[j - 1, i];
                             bool right = roads[j + 1, i];
-                            
-                            if (up && down && left && right) 
+
+
+                            if (up && down && left && right)
                             {
                                 Console.Write("╬");
                                 continue;
