@@ -16,6 +16,7 @@ namespace AdventureMap
 
             // to keep console open
             Console.ReadLine();
+
             static void Map(int width, int height, string title)
             {
                 Random random = new();
@@ -148,93 +149,94 @@ namespace AdventureMap
                     Console.WriteLine();
                 }
 
-                static Vector2 GenerateTitleStartPosition(int width, string title, int yStart = 1)
+                
+            }
+            static Vector2 GenerateTitleStartPosition(int width, string title, int yStart = 1)
+            {
+                int x = (width - title.Length) / 2;
+                return new Vector2(x, yStart);
+            }
+
+            static List<int> GenerateRiverStart(int height, int startOfLastQuarter)
+            {
+                Random random = new();
+                List<int> riverStart = [];
+
+                int currentRiverStart = startOfLastQuarter;
+
+                for (int y = 0; y < height; y++)
                 {
-                    int x = (width - title.Length) / 2;
-                    return new Vector2(x, yStart);
+                    riverStart.Add(currentRiverStart);
+                    int direction = random.Next(10);
+                    if (direction == 0 && currentRiverStart > startOfLastQuarter)
+                    {
+                        currentRiverStart--;
+                    }
+                    if (direction == 2)
+                    {
+                        currentRiverStart++;
+                    }
                 }
 
-                static List<int> GenerateRiverStart(int height, int startOfLastQuarter)
+                return riverStart;
+            }
+
+            static List<int> GenerateHorizontalPathY(int height, int width, List<int> riverStart)
+            {
+                Random random = new();
+                List<int> horizontalPathY = [];
+
+                int currentPathStepY = height / 2;
+
+                for (int x = 0; x < width; x++)
                 {
-                    Random random = new();
-                    List<int> riverStart = [];
-
-                    int currentRiverStart = startOfLastQuarter;
-
-                    for (int y = 0; y < height; y++)
+                    // if within map bounds and NOT on river 
+                    if ((currentPathStepY - 1 >= 2 || currentPathStepY <= height - 2) && (x < riverStart[currentPathStepY] - 2 || x > riverStart[currentPathStepY] + 6))
                     {
-                        riverStart.Add(currentRiverStart);
-                        int direction = random.Next(10);
-                        if (direction == 0 && currentRiverStart > startOfLastQuarter)
+                        int direction = random.Next(6);
+                        if (direction == 0)
                         {
-                            currentRiverStart--;
+                            currentPathStepY--;
                         }
                         if (direction == 2)
-                        { 
-                            currentRiverStart++;
-                        }
-                    }
-
-                    return riverStart;
-                }
-
-                static List<int> GenerateHorizontalPathY(int height, int width, List<int> riverStart)
-                {
-                    Random random = new();
-                    List<int> horizontalPathY = [];
-
-                    int currentPathStepY = height / 2;
-
-                    for (int x = 0; x < width; x++)
-                    {
-                        // if within map bounds and NOT on river 
-                        if ((currentPathStepY - 1 >= 2 || currentPathStepY <= height - 2) && (x < riverStart[currentPathStepY] - 2 || x > riverStart[currentPathStepY] + 6))
                         {
-                            int direction = random.Next(6);
-                            if (direction == 0)
-                            {
-                                currentPathStepY--;
-                            }
-                            if (direction == 2)
-                            {
-                                currentPathStepY++;
-                            }
-
-                            //safeguards
-                            if (currentPathStepY > height - 2)
-                            {
-                                currentPathStepY -= 2;
-                            }
-                            if (currentPathStepY < 2)
-                            {
-                                currentPathStepY = 2;
-                            }
-
+                            currentPathStepY++;
                         }
 
-                        horizontalPathY.Add(currentPathStepY);
-                    }
-
-                    return horizontalPathY;
-                }
-
-                static int GenerateRoadIntersectionY(int width, List<int> riverStart, List<int> horizontalPathY)
-                {
-                    int roadIntersectionX = 0;
-                    for (int x = 0; x < width; x++)
-                    {
-                        // if 5 away from river
-                        if (x > riverStart[horizontalPathY[x]] - 5)
+                        //safeguards
+                        if (currentPathStepY > height - 2)
                         {
-                            roadIntersectionX = x;
-                            break;
+                            currentPathStepY -= 2;
                         }
+                        if (currentPathStepY < 2)
+                        {
+                            currentPathStepY = 2;
+                        }
+
                     }
 
-                    int roadIntersectionY = horizontalPathY[roadIntersectionX];
-
-                    return roadIntersectionY;
+                    horizontalPathY.Add(currentPathStepY);
                 }
+
+                return horizontalPathY;
+            }
+
+            static int GenerateRoadIntersectionY(int width, List<int> riverStart, List<int> horizontalPathY)
+            {
+                int roadIntersectionX = 0;
+                for (int x = 0; x < width; x++)
+                {
+                    // if 5 away from river
+                    if (x > riverStart[horizontalPathY[x]] - 5)
+                    {
+                        roadIntersectionX = x;
+                        break;
+                    }
+                }
+
+                int roadIntersectionY = horizontalPathY[roadIntersectionX];
+
+                return roadIntersectionY;
             }
         }
     }
