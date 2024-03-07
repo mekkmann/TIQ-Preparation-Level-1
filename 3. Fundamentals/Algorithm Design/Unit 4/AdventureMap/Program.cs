@@ -26,8 +26,9 @@ namespace AdventureMap
                 int startOfLastQuarter = endOfFirstQuarter * 3 - 1;
                 List<string> treeSymbols = ["T", "@", "%", ")", "("];
                 Vector2 titleStart = GenerateTitleStartPosition(width, title);
-                List<int> riverStart = GenerateRiverStart(height, startOfLastQuarter);
-                List<int> horizontalPathY = GenerateHorizontalPathY(height, width, riverStart);
+                List<int> riverStart = GenerateCurve(height, startOfLastQuarter, 0.4f);
+                List<int> wallStart = GenerateCurve(height, endOfFirstQuarter + 1, 0.1f);
+                List<int> horizontalPathY = GenerateHorizontalPathY(height, width, riverStart, wallStart);
                 int roadIntersectionY = GenerateRoadIntersectionY(width, riverStart, horizontalPathY);
 
                 //Draw the map
@@ -86,25 +87,35 @@ namespace AdventureMap
                         //River
                         if (x >= riverStart[y] && x < riverStart[y] + 3)
                         {
-                            Console.ForegroundColor = ConsoleColor.Blue;
-
-                            int direction = riverStart[y + 1] - riverStart[y];
-
-                            if (direction == -1)
-                            {
-                                Console.Write("/");
-                            }
-                            else if (direction == 1)
-                            {
-                                Console.Write("\\");
-                            }
-                            else
-                            {
-                                Console.Write("|");
-                            }
-
+                            DrawCurve(riverStart, y, ConsoleColor.Blue);
                             continue;
                         }
+
+                        ////Turrets
+                        if (y == horizontalPathY[x] - 1 || y == horizontalPathY[x] + 1)
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkGray;
+
+                            if (x == wallStart[horizontalPathY[x]])
+                            {
+                                Console.Write("[");
+                                continue;
+                            }
+
+                            if (x == wallStart[horizontalPathY[x]] + 1)
+                            {
+                                Console.Write("]");
+                                continue;
+                            }
+                        }
+
+                        //Wall
+                        if (x >= wallStart[y] && x < wallStart[y] + 2)
+                        {
+                            DrawCurve(wallStart, y, ConsoleColor.DarkGray);
+                            continue;
+                        }
+
 
                         //Title
                         if (x == titleStart.X && y == titleStart.Y)
@@ -157,31 +168,54 @@ namespace AdventureMap
                 return new Vector2(x, yStart);
             }
 
-            static List<int> GenerateRiverStart(int height, int startOfLastQuarter)
+            static void DrawCurve(List<int> curve, int position, ConsoleColor consoleColor)
             {
-                Random random = new();
-                List<int> riverStart = [];
+                Console.ForegroundColor = consoleColor;
 
-                int currentRiverStart = startOfLastQuarter;
+                int direction = curve[position + 1] - curve[position];
 
-                for (int y = 0; y < height; y++)
+                if (direction == -1)
                 {
-                    riverStart.Add(currentRiverStart);
-                    int direction = random.Next(10);
-                    if (direction == 0 && currentRiverStart > startOfLastQuarter)
-                    {
-                        currentRiverStart--;
-                    }
-                    if (direction == 2)
-                    {
-                        currentRiverStart++;
-                    }
+                    Console.Write("/");
                 }
-
-                return riverStart;
+                else if (direction == 1)
+                {
+                    Console.Write("\\");
+                }
+                else
+                {
+                    Console.Write("|");
+                }
             }
 
-            static List<int> GenerateHorizontalPathY(int height, int width, List<int> riverStart)
+            static List<int> GenerateCurve(int height, int startPositionX, float curveChance)
+            {
+                Random random = new();
+                List<int> curveValues = [startPositionX];
+
+                int currentCurveStart = startPositionX;
+                for (int i = 0; i < height; i++)
+                {
+                    double curveChanceDouble = random.NextDouble();
+                    if (curveChanceDouble < curveChance)
+                    {
+                        int direction = random.Next(1, 3);
+                        if (direction == 2 && currentCurveStart > startPositionX)
+                        {
+                            currentCurveStart--;
+                        }
+                        if (direction == 1)
+                        {
+                            currentCurveStart++;
+                        }
+                    }
+                    curveValues.Add(currentCurveStart);
+                }
+
+                return curveValues;
+            }
+
+            static List<int> GenerateHorizontalPathY(int height, int width, List<int> riverStart, List<int> wallStart)
             {
                 Random random = new();
                 List<int> horizontalPathY = [];
@@ -190,32 +224,25 @@ namespace AdventureMap
 
                 for (int x = 0; x < width; x++)
                 {
-                    // if within map bounds and NOT on river 
-                    if ((currentPathStepY - 1 >= 2 || currentPathStepY <= height - 2) && (x < riverStart[currentPathStepY] - 2 || x > riverStart[currentPathStepY] + 6))
+                    horizontalPathY.Add(currentPathStepY);
+
+                    // if on river
+                    if (x >= riverStart[currentPathStepY] - 2 && x <= riverStart[currentPathStepY] + 6)
                     {
-                        int direction = random.Next(6);
-                        if (direction == 0)
-                        {
-                            currentPathStepY--;
-                        }
-                        if (direction == 2)
-                        {
-                            currentPathStepY++;
-                        }
-
-                        //safeguards
-                        if (currentPathStepY > height - 2)
-                        {
-                            currentPathStepY -= 2;
-                        }
-                        if (currentPathStepY < 2)
-                        {
-                            currentPathStepY = 2;
-                        }
-
+                        continue;
                     }
 
-                    horizontalPathY.Add(currentPathStepY);
+                    // if on wall
+                    if (x >= wallStart[currentPathStepY] - 1 && x <= wallStart[currentPathStepY] + 2)
+                    {
+                        continue;
+                    }
+
+                    // move path 
+                    int direction = random.Next(7);
+                    if (direction == 0 && currentPathStepY > 1) currentPathStepY--;
+                    if (direction == 1 && currentPathStepY < height - 2) currentPathStepY++;
+
                 }
 
                 return horizontalPathY;
