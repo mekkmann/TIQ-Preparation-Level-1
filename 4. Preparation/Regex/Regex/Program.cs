@@ -23,6 +23,9 @@
             // a list of strings to store the name of a monster that can fly 10-49 feet per turn
             List<string> nameOfSlowFlyers = [];
 
+            // a list of strings to store names and specific alignment of monsters
+            List<string> namesAndSpecificAlignment = [];
+
             // counter to keep track of if we're in a specific monsters block or are at the next
             int monsterLineCounter = 0;
 
@@ -39,6 +42,18 @@
                     nameList.Add(line);
                     // set the current monster name
                     currentName = line;
+                }
+
+                //alignment
+                if (monsterLineCounter == 1)
+                {
+                    string splitLine = line.Split(", ")[1];
+                    Match match = Regex.Match(splitLine, @"(chaotic|lawful|neutral) ?(good|neutral|evil)?");
+
+                    if (match.Success)
+                    {
+                        namesAndSpecificAlignment.Add($"{currentName} ({splitLine})");
+                    }
                 }
 
                 //hitpoints
@@ -93,6 +108,13 @@
             foreach (var name in nameOfSlowFlyers)
             {
                 Console.WriteLine(name);
+            }
+
+            //print monsters with specific alignments
+            Console.WriteLine("Monsters with a specific alignment:");
+            foreach (var monster in namesAndSpecificAlignment)
+            {
+                Console.WriteLine(monster);
             }
 
             //to keep console open
