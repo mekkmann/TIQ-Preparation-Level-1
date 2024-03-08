@@ -1,30 +1,10 @@
 ﻿namespace Regex
 {
+    using System.Text.RegularExpressions;
     internal class Program
     {
         static void Main(string[] args)
         {
-            //// MISSION 1 START
-            //// initiate a string with the path to a file
-            //string pathToFile = "MonsterManual.txt";
-
-            //// read all lines of a file and store them in an array of string
-            //string[] readFile = File.ReadAllLines(pathToFile);
-
-            //for (int i = 0; i < readFile.Length - 1; i++)
-            //{
-            //    if (i % 7 == 0)
-            //    {
-            //        Console.WriteLine(readFile[i]);
-            //    }
-            //}
-
-            ////to keep console open
-            //Console.ReadLine();
-            //// MISSION 1 END
-
-
-            // MISSION 2 START
             // initiate a string with the path to a file
             string pathToFile = "MonsterManual.txt";
 
@@ -37,6 +17,9 @@
             // a list of bool to store if a monster can fly or not
             List<bool> canFly = [];
 
+            // a list of bools to store if a monster needs 10 or more dice rolls for their hp
+            List<bool> tenPlusDiceRollsForHP = [];
+
             // counter to keep track of if we're in a specific monsters block or are at the next
             int monsterLineCounter = 0;
             foreach (var line in readFile)
@@ -45,6 +28,13 @@
                 if (monsterLineCounter == 0)
                 {
                     nameList.Add(line);
+                }
+
+                //hitpoints
+                if (monsterLineCounter == 2)
+                {
+                    tenPlusDiceRollsForHP.Add(Regex.IsMatch(line, @"\(\d{2}d"));
+
                 }
 
                 //can fly
@@ -64,15 +54,21 @@
                 }
             }
             // print monster name and ability to fly to console
-            Console.WriteLine("Monster in the manual are:");
+            Console.WriteLine("Monsters in the manual are:");
             for (var i = 0; i < nameList.Count; i++)
             {
                 Console.WriteLine($"{nameList[i]} - can fly: {canFly[i]}");
             }
 
+            //print monster name and if they require 10 or more dice rolls
+            Console.WriteLine("Monsters in the manual are:");
+            for (var i = 0; i < nameList.Count; i++)
+            {
+                Console.WriteLine($"{nameList[i]} - 10+ dice rolls: {tenPlusDiceRollsForHP[i]}");
+            }
+
             //to keep console open
             Console.ReadLine();
-            // MISSION 2 END
         }
     }
 }
