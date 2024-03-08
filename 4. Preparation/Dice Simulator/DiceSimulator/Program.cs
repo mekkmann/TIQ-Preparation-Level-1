@@ -42,7 +42,7 @@
             {
                 allNumbers[i] = i;
             }
-
+            // print every number and corresponding conversion (even the messed up ones)
             foreach (int number in allNumbers)
             {
                 Console.WriteLine($"{number} = {Convert.ToChar(number)}");
