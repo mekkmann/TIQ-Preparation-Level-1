@@ -20,36 +20,57 @@
             // a list of bools to store if a monster needs 10 or more dice rolls for their hp
             List<bool> tenPlusDiceRollsForHP = [];
 
+            // a list of strings to store the name of a monster that can fly 10-49 feet per turn
+            List<string> nameOfSlowFlyers = [];
+
             // counter to keep track of if we're in a specific monsters block or are at the next
             int monsterLineCounter = 0;
+
+            // keeps track of the current monsters name
+            string currentName = string.Empty;
+
+            // goes through the read file line by line
             foreach (var line in readFile)
             {
                 //name
                 if (monsterLineCounter == 0)
                 {
+                    // add name to nameList
                     nameList.Add(line);
+                    // set the current monster name
+                    currentName = line;
                 }
 
                 //hitpoints
                 if (monsterLineCounter == 2)
                 {
+                    // if the monster takes 10+ rolls for Hp, add to tenPlusDiceRollsForHP
                     tenPlusDiceRollsForHP.Add(Regex.IsMatch(line, @"\(\d{2}d"));
 
                 }
 
-                //can fly
+                //flying
                 if (monsterLineCounter == 4)
                 {
+                    // if the monster can fly, add to canFly
                     canFly.Add(line.Contains("fly"));
+
+                    // if the monster can fly 10-49 feet, add to nameOfSlowFlyers
+                    if (Regex.IsMatch(line, @"fly [1-4]\d "))
+                    {
+                        nameOfSlowFlyers.Add(currentName);
+                    }
                 }
 
                 //check if at the end of a monster
                 if (string.IsNullOrWhiteSpace(line))
                 {
+                    // if line is null or whitespace, we're at a new monster
                     monsterLineCounter = 0;
                 }
                 else
                 {
+                    // anything else we increment to the next line of the same monster
                     monsterLineCounter++;
                 }
             }
@@ -65,6 +86,13 @@
             for (var i = 0; i < nameList.Count; i++)
             {
                 Console.WriteLine($"{nameList[i]} - 10+ dice rolls: {tenPlusDiceRollsForHP[i]}");
+            }
+
+            //print monsters that are slow flyers
+            Console.WriteLine("Monsters that can fly 10-49 feet per turn:");
+            foreach (var name in nameOfSlowFlyers)
+            {
+                Console.WriteLine(name);
             }
 
             //to keep console open
