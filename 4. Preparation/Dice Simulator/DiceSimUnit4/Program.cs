@@ -6,134 +6,135 @@ namespace DiceSimUnit4
     {
         static void Main(string[] args)
         {
-            //// Should throw dice
-            //MakeDiceRoll("1d6+10");
-            //MakeDiceRoll("1d6-10");
-            //Console.WriteLine("NO BONUS");
-            //MakeDiceRoll("2d6");
-            //MakeDiceRoll("10d6");
-            //MakeDiceRoll("10d10");
-            //MakeDiceRoll("6d10");
-
-            //Console.WriteLine("POSITIVE BONUS");
-            //MakeDiceRoll("2d6+1");
-            //MakeDiceRoll("2d6+10");
-            //MakeDiceRoll("10d6+1");
-            //MakeDiceRoll("10d6+10");
-            //MakeDiceRoll("2d10+1");
-            //MakeDiceRoll("2d10+10");
-            //MakeDiceRoll("10d10+1");
-            //MakeDiceRoll("10d10+10");
-
-            //Console.WriteLine("NEGATIVE BONUS");
-            //MakeDiceRoll("2d6-1");
-            //MakeDiceRoll("2d6-10");
-            //MakeDiceRoll("10d6-1");
-            //MakeDiceRoll("10d6-10");
-            //MakeDiceRoll("2d10-1");
-            //MakeDiceRoll("2d10-10");
-            //MakeDiceRoll("10d10-1");
-            //MakeDiceRoll("10d10-10");
-
-            //Console.WriteLine("EXCEPTIONS");
-            //// should throw special exceptions
-            //MakeDiceRoll("34");
-            //MakeDiceRoll("-12");
-            //MakeDiceRoll("ad6");
-            //MakeDiceRoll("-3d6");
-            //MakeDiceRoll("0d6");
-            //MakeDiceRoll("d+");
-            //MakeDiceRoll("2d-4");
-            //MakeDiceRoll("2d2.5");
-            //MakeDiceRoll("2d$");
-
-
-            //// Should display dice notations and amount of rolls
-            //DiceNotationsAndRollsInText("To use the magic potion of Dragon Breath, first roll d8. If you roll 2 or higher, you manage to open the potion. Now roll 5d4+5 to see how many seconds the spell will last. Finally, the damage of the flames will be 2d6 per second.");
-
             Simulate();
         }
+
+        static void DrawArt(string path, ConsoleColor foregroundColor, string toBeReplaced = "", string replaceWith = "")
+        {
+            // set console foregroundcolor
+            Console.ForegroundColor = foregroundColor;
+            //read file and store all lines 
+            string[] logoLines = File.ReadAllLines(path);
+            // for each line in the string[]
+            foreach (var line in logoLines)
+            {
+                // check if we have the strings needed to replace anything
+                if (!string.IsNullOrWhiteSpace(toBeReplaced) && !string.IsNullOrWhiteSpace(replaceWith))
+                {
+                    // replace either toBeReplaced+1whitespace or just toBeraplaced.
+                    // dependent on the length of replaceWith
+                    // print line
+                    Console.WriteLine(line.Replace(replaceWith.Length == 2 ? $"{toBeReplaced} " : toBeReplaced, replaceWith.ToString()));
+                }
+                // otherwise
+                else
+                {
+                    //print line
+                    Console.WriteLine(line);
+                }
+            }
+            // stop execution for 0.5s to simulate it taking time
+            Thread.Sleep(500);
+            // spacing
+            Console.WriteLine();
+            // reset console foreground color back to normal
+            Console.ForegroundColor = ConsoleColor.Gray;
+        }
+        // function for running the program
         static void Simulate()
         {
-            bool isSimulating = true;
-            while (isSimulating)
+            // draw the logo
+            DrawArt("DiceLogo.txt", ConsoleColor.Magenta);
+            // store if we've got good input
+            bool isStandardNotation = false;
+            // store actual input
+            string? notationInput = string.Empty;
+            // print message to user
+            Console.WriteLine("Enter desired roll in standard dice notation:");
+            // while we don't have good input
+            while (!isStandardNotation)
             {
-                Console.WriteLine("DICE SIMULATOR\n");
-                bool isStandardNotation = false;
-                string? notationInput = string.Empty;
-                Console.WriteLine("Enter desired roll in standard dice notation:");
-                while (!isStandardNotation)
+                // get new input
+                notationInput = Console.ReadLine();
+                //spacing
+                Console.WriteLine();
+                // try or throw exception and go to catch
+                try
                 {
-                    notationInput = Console.ReadLine();
-                    Console.WriteLine();
-                    try
-                    {
-                        IsStandardDiceNotation(notationInput);
-                        isStandardNotation = true;
-                    }
-                    catch (ArgumentException ae)
-                    {
-                        Console.WriteLine($"{ae.Message} Try again:");
-                    }
+                    // will throw exception if not standard
+                    IsStandardDiceNotation(notationInput);
+                    // will only be called if an exception is not thrown
+                    // set to true, and exit while loop
+                    isStandardNotation = true;
                 }
-
-                Console.WriteLine($"You rolled {DiceRoll(notationInput)}.\n");
-                do
+                catch (ArgumentException ae) // catch exception
                 {
-                    Console.WriteLine("Do you want to (r)epeat, enter a (n)ew roll or (q)uit?");
-                    ConsoleKeyInfo keyInfo = Console.ReadKey(true);
-                    if (keyInfo.Key == ConsoleKey.R)
-                    {
-                        Console.WriteLine($"You rolled {DiceRoll(notationInput)}.\n");
-                    }
-                    else if (keyInfo.Key == ConsoleKey.N)
-                    {
-                        isStandardNotation = false;
-                        notationInput = string.Empty;
-                        Console.WriteLine("Enter desired roll in standard dice notation:");
-                        while (!isStandardNotation)
-                        {
-                            notationInput = Console.ReadLine();
-                            Console.WriteLine();
-                            try
-                            {
-                                IsStandardDiceNotation(notationInput);
-                                isStandardNotation = true;
-                            }
-                            catch (ArgumentException ae)
-                            {
-                                Console.WriteLine($"{ae.Message} Try again:");
-                            }
-                        }
-                        Console.WriteLine($"You rolled {DiceRoll(notationInput)}.\n");
-                    }
-                    else
-                    {
-                        return;
-                    }
-                } while (true);
+                    // tell the player to try again and then starts over with the loop
+                    Console.WriteLine($"{ae.Message} Try again:");
+                }
             }
-            // to keep console open
-            Console.ReadLine();
-        }
 
-        //static void AskForNotationInput()
-        //{
-        //    bool isStandardNotation = false;
-        //    string? notationInput = string.Empty;
-        //    Console.WriteLine("Enter desired roll in standard dice notation:");
-        //    while (!isStandardNotation)
-        //    {
-        //        notationInput = Console.ReadLine();
-        //        Console.WriteLine();
-        //        isStandardNotation = IsStandardDiceNotation(notationInput);
-        //        if (!isStandardNotation)
-        //        {
-        //            Console.WriteLine("You did not use standard dice notation. Try again:");
-        //        }
-        //    }
-        //    Console.WriteLine($"You rolled {DiceRoll(notationInput)}.\n");
-        //}
+            // when the user has exited the loop, roll dice and display total result and each dice roll
+            Console.WriteLine($"You rolled {DiceRoll(notationInput)}.\n");
+
+            // do this loop at least once
+            do
+            {
+                // print message to player asking for repeat, new roll or quit
+                // key to press is signified by parentheses around letter
+                Console.WriteLine("Do you want to (r)epeat, enter a (n)ew roll or (q)uit?");
+                // read the players input
+                ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                // if player pressed 'r'
+                if (keyInfo.Key == ConsoleKey.R)
+                {
+                    //roll same dice notation as before and display total result and each dice roll
+                    Console.WriteLine($"You rolled {DiceRoll(notationInput)}.\n");
+                }
+                /// if player pressed 'n'
+                else if (keyInfo.Key == ConsoleKey.N)
+                {
+                    // reset good input to false
+                    isStandardNotation = false;
+                    // reset actualinput to empty
+                    notationInput = string.Empty;
+                    // print message to user
+                    Console.WriteLine("Enter desired roll in standard dice notation:");
+                    // while we don't have good input
+                    while (!isStandardNotation)
+                    {
+                        // get new input
+                        notationInput = Console.ReadLine();
+                        //spacing
+                        Console.WriteLine();
+                        // try or throw exception and go to catch
+                        try
+                        {
+                            // will throw exception if not standard
+                            IsStandardDiceNotation(notationInput);
+                            // will only be called if an exception is not thrown
+                            // set to true, and exit while loop
+                            isStandardNotation = true;
+                        }
+                        catch (ArgumentException ae) // catch exception
+                        {
+                            // tell the player to try again and then starts over with the loop
+                            Console.WriteLine($"{ae.Message} Try again:");
+                        }
+                    }
+
+                    // when the user has exited the loop, roll dice and display total result and each dice roll
+                    Console.WriteLine($"You rolled {DiceRoll(notationInput)}.\n");
+                }
+                // if any other key was pressed
+                else
+                {
+                    // exit program
+                    return;
+                }
+                // the return above cancels the do-while below 
+            } while (true);
+        }
 
         // function that calculates the total of a roll w/ or w/o the fixedBonus
         static int DiceRoll(int numberOfRolls, int diceSides, int fixedBonus = 0)
@@ -149,9 +150,25 @@ namespace DiceSimUnit4
                 int randomNumber = random.Next(1, diceSides + 1);
                 // add the randomNumber to the total
                 total += randomNumber;
+
                 // print result of every roll
-                Console.WriteLine($"{OrdinalNumber(i + 1)} roll is: {randomNumber}");
+                if (diceSides == 4) // if dice is d4
+                {
+                    // call function to draw dice
+                    DrawArt("D4.txt", ConsoleColor.Red, "X", randomNumber.ToString());
+                }
+                else if (diceSides == 6) // if dice is d6
+                {
+                    // call function to draw dice
+                    DrawArt("D6.txt", ConsoleColor.Green, "X", randomNumber.ToString());
+                }
+                else // else
+                {
+                    // print normal text instead of dice
+                    Console.WriteLine($"{OrdinalNumber(i + 1)} roll is: {randomNumber}");
+                }
             }
+            //spacing
             Console.WriteLine();
 
             // return the result of the roll
@@ -219,7 +236,6 @@ namespace DiceSimUnit4
         // function that checks if a string is in standard dice notation
         static void IsStandardDiceNotation(string text)
         {
-
             // split input by 'd'
             string[] textParts = text.Split('d');
             // if the length of textParts i equal to or less than 1
@@ -240,7 +256,7 @@ namespace DiceSimUnit4
                 // if it is not longer than 0, set numberOfRolls to 1
                 numberOfRolls = textParts[0].Length > 0 ? int.Parse(textParts[0]) : 1;
             }
-            catch // catch the excpetion
+            catch // catch the exception
             {
                 // throw exception with description
                 throw new ArgumentException($"Number of rolls ({textParts[0]}) is not an integer.");
@@ -255,7 +271,6 @@ namespace DiceSimUnit4
 
             // split element at textParts 1 (what comes after the d) by either '+' or '-'
             textParts = textParts[1].Split(['+', '-']);
-
 
             // to store dice sides
             int diceSides;
