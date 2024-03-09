@@ -7,8 +7,35 @@ namespace DiceSimUnit4
         static void Main(string[] args)
         {
             //// Should throw dice
+            //MakeDiceRoll("1d6+10");
+            //MakeDiceRoll("1d6-10");
+            //Console.WriteLine("NO BONUS");
             //MakeDiceRoll("2d6");
+            //MakeDiceRoll("10d6");
+            //MakeDiceRoll("10d10");
+            //MakeDiceRoll("6d10");
 
+            //Console.WriteLine("POSITIVE BONUS");
+            //MakeDiceRoll("2d6+1");
+            //MakeDiceRoll("2d6+10");
+            //MakeDiceRoll("10d6+1");
+            //MakeDiceRoll("10d6+10");
+            //MakeDiceRoll("2d10+1");
+            //MakeDiceRoll("2d10+10");
+            //MakeDiceRoll("10d10+1");
+            //MakeDiceRoll("10d10+10");
+
+            //Console.WriteLine("NEGATIVE BONUS");
+            //MakeDiceRoll("2d6-1");
+            //MakeDiceRoll("2d6-10");
+            //MakeDiceRoll("10d6-1");
+            //MakeDiceRoll("10d6-10");
+            //MakeDiceRoll("2d10-1");
+            //MakeDiceRoll("2d10-10");
+            //MakeDiceRoll("10d10-1");
+            //MakeDiceRoll("10d10-10");
+
+            //Console.WriteLine("EXCEPTIONS");
             //// should throw special exceptions
             //MakeDiceRoll("34");
             //MakeDiceRoll("-12");
@@ -28,25 +55,86 @@ namespace DiceSimUnit4
         }
         static void Simulate()
         {
-            Console.WriteLine("DICE SIMULATOR\n");
-            bool isStandardNotation = false;
-            string? notationInput = string.Empty;
-            Console.WriteLine("Enter desired roll in standard dice notation:");
-            while (!isStandardNotation)
+            bool isSimulating = true;
+            while (isSimulating)
             {
-                notationInput = Console.ReadLine();
-                Console.WriteLine();
-                isStandardNotation = IsStandardDiceNotation(notationInput);
-                if (!isStandardNotation)
+                Console.WriteLine("DICE SIMULATOR\n");
+                bool isStandardNotation = false;
+                string? notationInput = string.Empty;
+                Console.WriteLine("Enter desired roll in standard dice notation:");
+                while (!isStandardNotation)
                 {
-                    Console.WriteLine("You did not use standard dice notation. Try again:");
+                    notationInput = Console.ReadLine();
+                    Console.WriteLine();
+                    try
+                    {
+                        IsStandardDiceNotation(notationInput);
+                        isStandardNotation = true;
+                    }
+                    catch (ArgumentException ae)
+                    {
+                        Console.WriteLine($"{ae.Message} Try again:");
+                    }
                 }
-            }
 
-            Console.WriteLine($"You rolled {DiceRoll(notationInput)}.");
+                Console.WriteLine($"You rolled {DiceRoll(notationInput)}.\n");
+                do
+                {
+                    Console.WriteLine("Do you want to (r)epeat, enter a (n)ew roll or (q)uit?");
+                    ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                    if (keyInfo.Key == ConsoleKey.R)
+                    {
+                        Console.WriteLine($"You rolled {DiceRoll(notationInput)}.\n");
+                    }
+                    else if (keyInfo.Key == ConsoleKey.N)
+                    {
+                        isStandardNotation = false;
+                        notationInput = string.Empty;
+                        Console.WriteLine("Enter desired roll in standard dice notation:");
+                        while (!isStandardNotation)
+                        {
+                            notationInput = Console.ReadLine();
+                            Console.WriteLine();
+                            try
+                            {
+                                IsStandardDiceNotation(notationInput);
+                                isStandardNotation = true;
+                            }
+                            catch (ArgumentException ae)
+                            {
+                                Console.WriteLine($"{ae.Message} Try again:");
+                            }
+                        }
+                        Console.WriteLine($"You rolled {DiceRoll(notationInput)}.\n");
+                    }
+                    else
+                    {
+                        return;
+                    }
+                } while (true);
+            }
             // to keep console open
             Console.ReadLine();
         }
+
+        //static void AskForNotationInput()
+        //{
+        //    bool isStandardNotation = false;
+        //    string? notationInput = string.Empty;
+        //    Console.WriteLine("Enter desired roll in standard dice notation:");
+        //    while (!isStandardNotation)
+        //    {
+        //        notationInput = Console.ReadLine();
+        //        Console.WriteLine();
+        //        isStandardNotation = IsStandardDiceNotation(notationInput);
+        //        if (!isStandardNotation)
+        //        {
+        //            Console.WriteLine("You did not use standard dice notation. Try again:");
+        //        }
+        //    }
+        //    Console.WriteLine($"You rolled {DiceRoll(notationInput)}.\n");
+        //}
+
         // function that calculates the total of a roll w/ or w/o the fixedBonus
         static int DiceRoll(int numberOfRolls, int diceSides, int fixedBonus = 0)
         {
@@ -102,17 +190,19 @@ namespace DiceSimUnit4
                 // return the result of diceroll without any bonus
                 return DiceRoll(numberOfRolls, diceSides);
             }
-
-
         }
 
         //function that does a diceroll 10 times with a diceNotation
         static void MakeDiceRoll(string diceNotation)
         {
             // if not standard dice notation
-            if (!IsStandardDiceNotation(diceNotation))
+            try
             {
-                // early return to stop dice from being thrown
+                IsStandardDiceNotation(diceNotation);
+            }
+            catch (ArgumentException ae)
+            {
+                Console.WriteLine($"Can't throw {diceNotation} ... {ae.Message}");
                 return;
             }
             // prints what diceNotation we're rolling
@@ -127,114 +217,85 @@ namespace DiceSimUnit4
         }
 
         // function that checks if a string is in standard dice notation
-        static bool IsStandardDiceNotation(string text)
+        static void IsStandardDiceNotation(string text)
         {
 
-            // regex match with standard dice notation
-            Match match = Regex.Match(text, @"^(-)?([\w{1,2}])?(\w)?(.{1,3})?(\d{1,2})?$");
-
-            // if the regex matches 
-            if (match.Success)
+            // split input by 'd'
+            string[] textParts = text.Split('d');
+            // if the length of textParts i equal to or less than 1
+            if (textParts.Length <= 1)
             {
-                // try performing code and if successful, skip and if exception is thrown go to catch
-                // checks if the notation is completely wrong
-                try
-                {
-                    // if text doesn't contain 'd' AND '-' is in string OR if text doesn't contain 'd'
-                    if (!text.Contains('d') && match.Groups[1].Value == "-" || !text.Contains('d'))
-                    {
-                        // throw a new exception with an error message
-                        throw new ArgumentException($"Can't throw {text} ... Roll description is not in standard dice notation.");
-                    }
-                }
-                // catch the exception
-                catch (ArgumentException ae)
-                {
-                    // print the error message
-                    Console.WriteLine(ae.Message);
-                    // return false
-                    return false;
-                }
-
-                // try performing code and if successful, skip and if exception is thrown go to catch
-                // check if dice sides is an integer or negative
-                try
-                {
-                    // check if parsing is possible
-                    if (int.TryParse(match.Groups[4].Value, out int diceSides))
-                    {
-                        // if the value contains '-'
-                        if (match.Groups[4].Value.Contains('-'))
-                        {
-                            // throw a new exception with an error message
-                            throw new ArgumentException($"Can't throw {text} ... Dice sides ({match.Groups[4].Value[0]}) is not an integer");
-                        }
-                        // if diceSides equals 0
-                        if (diceSides == 0)
-                        {
-                            // throw a new exception with an error message
-                            throw new ArgumentException($"Can't throw {text} ... Dice sides ({diceSides}) needs to be positive");
-                        }
-                    }
-                    else // if where dice sides should be is not an int
-                    {
-                        // check that these two groups aren't null, empty or whitespace
-                        if (!string.IsNullOrWhiteSpace(match.Groups[5].Value) && !string.IsNullOrWhiteSpace(match.Groups[7].Value))
-                        {
-                            // throw a new exception with an error message
-                            throw new ArgumentException($"Can't throw {text} ... Dice sides ({match.Groups[5].Value + match.Groups[7].Value}) is not an integer");
-                        }
-                        // check that this group isn't null, empty or whitespace
-                        if (!string.IsNullOrWhiteSpace(match.Groups[4].Value))
-                        {
-                            // throw a new exception with an error message
-                            throw new ArgumentException($"Can't throw {text} ... Dice sides ({match.Groups[4]}) is not an integer");
-                        }
-                    }
-                }
-                // catch the exception
-                catch (ArgumentException ae)
-                {
-                    // print the error message
-                    Console.WriteLine(ae.Message);
-                    // return false
-                    return false;
-                }
-
-                // try performing code and if successful, skip and if exception is thrown go to catch
-                // check if number of rolls is an integer or negative
-                try
-                {
-                    // try to parse
-                    if (int.TryParse(match.Groups[2].Value, out int numberOfRolls))
-                    {
-                        // if any of these are true
-                        if (match.Groups[1].Value == "-" || numberOfRolls == 0)
-                        {
-                            // throw a new exception with an error message
-                            throw new ArgumentException($"Can't throw {text} ... Number of rolls ({match.Groups[1].Value + numberOfRolls}) needs to be positive");
-                        }
-                    }
-                    else // if where number of rolls should be is not an int
-                    {
-                        // throw a new exception with an error message
-                        throw new ArgumentException($"Can't throw {text} ... Number of rolls ({match.Groups[2].Value}) is not an integer");
-                    }
-                }
-                // catch the exception
-                catch (ArgumentException ae)
-                {
-                    // print the error message
-                    Console.WriteLine(ae.Message);
-                    // return false
-                    return false;
-                }
-
-
+                // throw exception with description
+                throw new ArgumentException($"Roll description is not in standard dice notation.");
             }
-            //return true
-            return true;
+
+            // to store number of rolls
+            int numberOfRolls;
+            // try to execute some code and if we get an exception, go to catch
+            try
+            {
+                // if the first element of textParts is longer than 0
+                // if it is longer than 0, try to parse it (it will throw an exception if it can't)
+                // and if it can parse set numberOfRolls to parsed value.
+                // if it is not longer than 0, set numberOfRolls to 1
+                numberOfRolls = textParts[0].Length > 0 ? int.Parse(textParts[0]) : 1;
+            }
+            catch // catch the excpetion
+            {
+                // throw exception with description
+                throw new ArgumentException($"Number of rolls ({textParts[0]}) is not an integer.");
+            }
+
+            // if number of rolls is less than or equal to 0
+            if (numberOfRolls <= 0)
+            {
+                // throw exception with description
+                throw new ArgumentException($"Number of rolls ({textParts[0]}) has to be positive.");
+            }
+
+            // split element at textParts 1 (what comes after the d) by either '+' or '-'
+            textParts = textParts[1].Split(['+', '-']);
+
+
+            // to store dice sides
+            int diceSides;
+            // try to execute some code and if we get an exception, go to catch
+            try
+            {
+                // if we can parse element at index 0, set diceSides to parsed value. Otherwise throw excption
+                diceSides = int.Parse(textParts[0]);
+            }
+            catch // catch exception
+            {
+                // throw exception with description
+                throw new ArgumentException($"Number of dice sides ({textParts[0]}) is not an integer.");
+            }
+
+            // if diceSides is less than or equal to 0
+            if (diceSides <= 0)
+            {
+                // throw exception with description               
+                throw new ArgumentException($"Number of sides ({textParts[0]}) has to be positive.");
+            }
+
+            // if textParts is longer than 1
+            if (textParts.Length > 1)
+            {
+                // try to execute some code and if we get an exception, go to catch
+                try
+                {
+                    // to store fixed bonus
+                    // if we can parse element at index 1, discard parsed value. Otherwise throw excption
+                    _ = int.Parse(textParts[1]);
+                }
+                catch // catch exception
+                {
+                    // throw exception with description
+                    throw new ArgumentException($"Fixed bonus ({textParts[1]}) is not an integer.");
+                }
+            }
         }
+
         //function that checks how many rolls are in a dice notation
         static int RollsInDiceNotation(string diceNotation)
         {
