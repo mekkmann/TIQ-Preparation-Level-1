@@ -1,4 +1,6 @@
-﻿namespace DiceSimUnit2
+﻿using System.Text.RegularExpressions;
+
+namespace DiceSimUnit2
 {
     internal class Program
     {
@@ -10,6 +12,11 @@
             MakeDiceRoll("d8-12");
             MakeDiceRoll("2d4-1");
             MakeDiceRoll("2d4+1");
+
+            // Should not throw dice
+            MakeDiceRoll("34");
+            MakeDiceRoll("ad");
+            MakeDiceRoll("33d4*2");
 
             // to keep console open
             Console.ReadLine();
@@ -34,7 +41,7 @@
 
         // function that splits a string and checks the dice notation
         // and then runs the DiceRoll function above
-        static int DiceRoll(string diceNotation)
+        static int? DiceRoll(string diceNotation)
         {
             // splits the diceNotation string based on delimiters
             string[] notationParts = diceNotation.Split(['d', '-', '+']);
@@ -68,6 +75,14 @@
         //function that does a diceroll 10 times with a diceNotation
         static void MakeDiceRoll(string diceNotation)
         {
+            // if not standard dice notation
+            if (!IsStandardDiceNotation(diceNotation))
+            {
+                // write error message
+                Console.WriteLine($"Can't throw {diceNotation}, it's not in standard dice notation.");
+                // early return to stop dice from being thrown
+                return;
+            }
             // prints what diceNotation we're rolling
             Console.Write($"Throwing {diceNotation} ... ");
             for (int i = 0; i < 10; i++)
@@ -77,6 +92,21 @@
             }
             // prints new line for separation
             Console.WriteLine();
+        }
+
+        // function that checks if a string is in standard dice notation
+        static bool IsStandardDiceNotation(string text)
+        {
+            // regex match with standard dice notation
+            Match match = Regex.Match(text, @"^(\d{1,2})?d(\d{1,2})([+-])?(\d{1,2})?$");
+            // if the regex matches
+            if (match.Success)
+            {
+                // return true;
+                return true;
+            }
+            // if the regex doesn't match, return false
+            return false;
         }
     }
 }
