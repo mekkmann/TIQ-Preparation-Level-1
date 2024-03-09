@@ -6,26 +6,10 @@ namespace DiceSimMission3
     {
         static void Main(string[] args)
         {
-            Console.Write("Throwing 1d6 ... ");
-            for (int i = 0; i < 10; i++)
-            {
-                Console.Write(" " + DiceRoll("1d6"));
-            }
-            Console.Write("\nThrowing 2d8 ... ");
-            for (int i = 0; i < 10; i++)
-            {
-                Console.Write(" " + DiceRoll("2d8"));
-            }
-            Console.Write("\nThrowing 3d6+8 ... ");
-            for (int i = 0; i < 10; i++)
-            {
-                Console.Write(" " + DiceRoll("3d6+8"));
-            }
-            Console.Write("\nThrowing 1d4+4 ... ");
-            for (int i = 0; i < 10; i++)
-            {
-                Console.Write(" " + DiceRoll("1d4+4"));
-            }
+            MakeDiceRoll("1d6");
+            MakeDiceRoll("2d8");
+            MakeDiceRoll("3d6+8");
+            MakeDiceRoll("1d4+4");
 
             // to keep console open
             Console.ReadLine();
@@ -75,6 +59,20 @@ namespace DiceSimMission3
 
             // returns result
             return result;
+        }
+
+        //function that does a diceroll 10 times with a diceNotation
+        static void MakeDiceRoll(string diceNotation)
+        {
+            // prints what diceNotation we're rolling
+            Console.Write($"Throwing {diceNotation} ... ");
+            for (int i = 0; i < 10; i++)
+            {
+                //simulating 10 rolls and prints the results
+                Console.Write(" " + DiceRoll($"{diceNotation}"));
+            }
+            // prints new line for separation
+            Console.WriteLine();
         }
     }
 }
