@@ -6,6 +6,7 @@ namespace DiceSimUnit2
     {
         static void Main(string[] args)
         {
+            // Should throw dice
             MakeDiceRoll("d6");
             MakeDiceRoll("2d4");
             MakeDiceRoll("d8+12");
@@ -17,6 +18,9 @@ namespace DiceSimUnit2
             MakeDiceRoll("34");
             MakeDiceRoll("ad");
             MakeDiceRoll("33d4*2");
+
+            // Should display dice notations and amount of rolls
+            DiceNotationsAndRollsInText("To use the magic potion of Dragon Breath, first roll d8. If you roll 2 or higher, you manage to open the potion. Now roll 5d4+5 to see how many seconds the spell will last. Finally, the damage of the flames will be 2d6 per second.");
 
             // to keep console open
             Console.ReadLine();
@@ -107,6 +111,43 @@ namespace DiceSimUnit2
             }
             // if the regex doesn't match, return false
             return false;
+        }
+
+        //function that checks how many rolls are in a dice notation
+        static int RollsInDiceNotation(string diceNotation)
+        {
+            // regex match to check for dice rolls
+            Match match = Regex.Match(diceNotation, @"(\d{0,2})?d\d");
+
+            // if where the dice roll should be is null or whitespace return 1 else return parsed dice rolls
+            return string.IsNullOrWhiteSpace(match.Groups[1].Value) ? 1 : int.Parse(match.Groups[1].Value);
+        }
+
+        // function that counts and prints amount of dice notations and total rolls in a text
+        static void DiceNotationsAndRollsInText(string text)
+        {
+            // regex pattern 
+            string regexPattern = @"(\d{1,2})?d(\d{1,2})([+-])?(\d{1,2})?";
+            // regex match to check for dice notations
+            Match match = Regex.Match(text, regexPattern);
+            // regex count to count all dice notations
+            int amountOfNotations = Regex.Count(text, regexPattern);
+
+            // keep track of total dice rolls
+            int totalRolls = 0;
+            // for every match
+            for (var i = 0; i < amountOfNotations; i++)
+            {
+                // check how many rolls are in a notation and add to totalRolls
+                totalRolls += RollsInDiceNotation(match.Groups[0].Value);
+
+                // set match to the next match
+                match = match.NextMatch();
+            }
+            // print total amount of notations
+            Console.WriteLine($"{amountOfNotations} standard dice notations present.");
+            // print total amount of rolls
+            Console.WriteLine($"The player will have to perform {totalRolls} rolls.");
         }
     }
 }
