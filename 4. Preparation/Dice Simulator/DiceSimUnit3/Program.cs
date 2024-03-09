@@ -7,17 +7,19 @@ namespace DiceSimUnit2
         static void Main(string[] args)
         {
             // Should throw dice
-            MakeDiceRoll("d6");
-            MakeDiceRoll("2d4");
-            MakeDiceRoll("d8+12");
-            MakeDiceRoll("d8-12");
-            MakeDiceRoll("2d4-1");
-            MakeDiceRoll("2d4+1");
+            MakeDiceRoll("2d6");
 
-            // Should not throw dice
+            // should throw special exceptions
             MakeDiceRoll("34");
-            MakeDiceRoll("ad");
-            MakeDiceRoll("33d4*2");
+            MakeDiceRoll("-12");
+            MakeDiceRoll("ad6");
+            MakeDiceRoll("-3d6");
+            MakeDiceRoll("0d6");
+            MakeDiceRoll("d+");
+            MakeDiceRoll("2d-4");
+            MakeDiceRoll("2d2.5");
+            MakeDiceRoll("2d$");
+
 
             // Should display dice notations and amount of rolls
             DiceNotationsAndRollsInText("To use the magic potion of Dragon Breath, first roll d8. If you roll 2 or higher, you manage to open the potion. Now roll 5d4+5 to see how many seconds the spell will last. Finally, the damage of the flames will be 2d6 per second.");
@@ -45,7 +47,7 @@ namespace DiceSimUnit2
 
         // function that splits a string and checks the dice notation
         // and then runs the DiceRoll function above
-        static int? DiceRoll(string diceNotation)
+        static int DiceRoll(string diceNotation)
         {
             // splits the diceNotation string based on delimiters
             string[] notationParts = diceNotation.Split(['d', '-', '+']);
@@ -74,6 +76,8 @@ namespace DiceSimUnit2
                 // return the result of diceroll without any bonus
                 return DiceRoll(numberOfRolls, diceSides);
             }
+
+
         }
 
         //function that does a diceroll 10 times with a diceNotation
@@ -82,8 +86,6 @@ namespace DiceSimUnit2
             // if not standard dice notation
             if (!IsStandardDiceNotation(diceNotation))
             {
-                // write error message
-                Console.WriteLine($"Can't throw {diceNotation}, it's not in standard dice notation.");
                 // early return to stop dice from being thrown
                 return;
             }
@@ -101,18 +103,115 @@ namespace DiceSimUnit2
         // function that checks if a string is in standard dice notation
         static bool IsStandardDiceNotation(string text)
         {
+
             // regex match with standard dice notation
-            Match match = Regex.Match(text, @"^(\d{1,2})?d(\d{1,2})([+-])?(\d{1,2})?$");
-            // if the regex matches
+            Match match = Regex.Match(text, @"^(-)?([\w{1,2}])?(\w)?(.{1,3})?(\d{1,2})?$");
+
+            // if the regex matches 
             if (match.Success)
             {
-                // return true;
+                // try performing code and if successful, skip and if exception is thrown go to catch
+                // checks if the notation is completely wrong
+                try
+                {
+                    // if text doesn't contain 'd' AND '-' is in string OR if text doesn't contain 'd'
+                    if (!text.Contains('d') && match.Groups[1].Value == "-" || !text.Contains('d'))
+                    {
+                        // throw a new exception with an error message
+                        throw new ArgumentException($"Can't throw {text} ... Roll description is not in standard dice rotation.");
+                    }
+                }
+                // catch the exception
+                catch (ArgumentException ae)
+                {
+                    // print the error message
+                    Console.WriteLine(ae.Message);
+                    // return false
+                    return false;
+                }
+
+                // try performing code and if successful, skip and if exception is thrown go to catch
+                // check if dice sides is an integer or negative
+                try
+                {
+                    // check if parsing is possible
+                    if (int.TryParse(match.Groups[4].Value, out int diceSides))
+                    {
+                        // if the value contains '-'
+                        if (match.Groups[4].Value.Contains('-'))
+                        {
+                            // throw a new exception with an error message
+                            throw new ArgumentException($"Can't throw {text} ... Dice sides ({match.Groups[4].Value[0]}) is not an integer");
+                        }
+                        // if diceSides equals 0
+                        if (diceSides == 0)
+                        {
+                            // throw a new exception with an error message
+                            throw new ArgumentException($"Can't throw {text} ... Dice sides ({diceSides}) needs to be positive");
+                        }
+                    }
+                    else // if where dice sides should be is not an int
+                    {
+                        // check that these two groups aren't null, empty or whitespace
+                        if (!string.IsNullOrWhiteSpace(match.Groups[5].Value) && !string.IsNullOrWhiteSpace(match.Groups[7].Value))
+                        {
+                            // throw a new exception with an error message
+                            throw new ArgumentException($"Can't throw {text} ... Dice sides ({match.Groups[5].Value + match.Groups[7].Value}) is not an integer");
+                        }
+                        // check that this group isn't null, empty or whitespace
+                        if (!string.IsNullOrWhiteSpace(match.Groups[4].Value))
+                        {
+                            // throw a new exception with an error message
+                            throw new ArgumentException($"Can't throw {text} ... Dice sides ({match.Groups[4]}) is not an integer");
+                        }
+                    }
+                }
+                // catch the exception
+                catch (ArgumentException ae)
+                {
+                    // print the error message
+                    Console.WriteLine(ae.Message);
+                    // return false
+                    return false;
+                }
+
+                // try performing code and if successful, skip and if exception is thrown go to catch
+                // check if number of rolls is an integer or negative
+                try
+                {
+                    // try to parse
+                    if (int.TryParse(match.Groups[2].Value, out int numberOfRolls))
+                    {
+                        // if any of these are true
+                        if (match.Groups[1].Value == "-" || numberOfRolls == 0)
+                        {
+                            // throw a new exception with an error message
+                            throw new ArgumentException($"Can't throw {text} ... Number of rolls ({match.Groups[1].Value + numberOfRolls}) needs to be positive");
+                        }
+                    }
+                    else // if where number of rolls should be is not an int
+                    {
+                        // throw a new exception with an error message
+                        throw new ArgumentException($"Can't throw {text} ... Number of rolls ({match.Groups[2].Value}) is not an integer");
+                    }
+                }
+                // catch the exception
+                catch (ArgumentException ae)
+                {
+                    // print the error message
+                    Console.WriteLine(ae.Message);
+                    // return false
+                    return false;
+                }
+
+
+                //return true
                 return true;
             }
-            // if the regex doesn't match, return false
+
+            Console.WriteLine($"{text} is unsolved");
             return false;
         }
-
         //function that checks how many rolls are in a dice notation
         static int RollsInDiceNotation(string diceNotation)
         {
