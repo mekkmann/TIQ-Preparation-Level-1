@@ -118,7 +118,7 @@ namespace DiceSimUnit2
                     if (!text.Contains('d') && match.Groups[1].Value == "-" || !text.Contains('d'))
                     {
                         // throw a new exception with an error message
-                        throw new ArgumentException($"Can't throw {text} ... Roll description is not in standard dice rotation.");
+                        throw new ArgumentException($"Can't throw {text} ... Roll description is not in standard dice notation.");
                     }
                 }
                 // catch the exception
@@ -205,12 +205,9 @@ namespace DiceSimUnit2
                 }
 
 
-                //return true
-                return true;
             }
-
-            Console.WriteLine($"{text} is unsolved");
-            return false;
+            //return true
+            return true;
         }
         //function that checks how many rolls are in a dice notation
         static int RollsInDiceNotation(string diceNotation)
