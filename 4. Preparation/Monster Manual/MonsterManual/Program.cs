@@ -14,18 +14,83 @@ namespace MonsterManual
             //list to store all monster types and generate monster types
             List<MonsterType> allMonsterTypes = GenerateMonstersFromFile(monsterManualLines);
 
+            // prints title
+            Console.WriteLine("MONSTER MANUAL\n");
+            // prints instruction
+            Console.WriteLine("Enter a query to search monsters by name:");
+            // stores query results
+            List<MonsterType> queryResults = [];
+            // stores query input
+            string queryInput = string.Empty;
+
+            // do at least once and then while there are no results in the query
+            do
+            {
+                queryInput = Console.ReadLine();
+                foreach (MonsterType monster in allMonsterTypes)
+                {
+                    if (monster.name.Contains(queryInput, StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        queryResults.Add(monster);
+                    }
+                }
+                if (queryResults.Count == 0)
+                {
+                    Console.WriteLine("\nNo monsters found. Try again:");
+                }
+
+            } while (queryResults.Count == 0);
+
+            // if 1 result 
+            if (queryResults.Count == 1)
+            {
+                //print sentence and monster data to console
+                Console.WriteLine($"\nDisplaying information for {queryResults[0].name}\n");
+                queryResults[0].PrintMonsterData();
+            }
+            // if more than 1 result
+            else
+            {
+                // ask user which monster to look yup
+                Console.WriteLine("\nWhich monster did you want to look up?:\n");
+
+                // print all options
+                for (int i = 0; i < queryResults.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}: {queryResults[i].name}");
+                }
+
+                // ask user for number
+                Console.WriteLine("\nEnter Number:");
+                // take number input
+                string numberInput = Console.ReadLine();
+
+                // parse number input and subtract 1 to get index of monster
+                int numberInputAsIndex = int.Parse(numberInput) - 1;
+
+                //print sentence and monster data to console
+                Console.WriteLine($"\nDisplaying information for {queryResults[numberInputAsIndex].name}\n");
+                queryResults[numberInputAsIndex].PrintMonsterData();
+            }
+
+            // to keep console open
+            Console.ReadLine();
+        }
+
+        // functions to display all monster data
+        static void DisplayAllMonsterData(List<MonsterType> list)
+        {
             // for every element in list
-            foreach (MonsterType monsterType in allMonsterTypes)
+            foreach (MonsterType monsterType in list)
             {
                 // print monster data
                 monsterType.PrintMonsterData();
                 //spacing 
                 Console.WriteLine();
             }
-            // to keep console open
-            Console.ReadLine();
         }
 
+        // function to generate all monster types from file
         static List<MonsterType> GenerateMonstersFromFile(string[] readFile)
         {
 

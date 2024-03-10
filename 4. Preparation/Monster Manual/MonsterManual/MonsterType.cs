@@ -6,13 +6,13 @@
     {
         //variables
         //name
-        string name = name;
+        public string name = name;
         //description
-        string description = description;
+        public string description = description;
         //alignment
-        string alignment = alignment;
+        public string alignment = alignment;
         //dice notation for hp roll (or just hp in rare cases)
-        string hpRoll = hpRoll;
+        public string hpRoll = hpRoll;
 
         // functions
 
