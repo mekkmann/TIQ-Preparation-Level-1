@@ -14,6 +14,14 @@ namespace MonsterManual
             //list to store all monster types and generate monster types
             List<MonsterType> allMonsterTypes = GenerateMonstersFromFile(monsterManualLines);
 
+            // path to ArmorTypes.txt
+            string armorTypesPath = "ArmorTypes.txt";
+            // read and store all lines from file
+            string[] armorTypeLines = File.ReadAllLines(armorTypesPath);
+
+            //dictionary to store all armor types fore easy access and generate them
+            Dictionary<ArmorTypeId, ArmorType> armorTypes = GenerateAllArmorTypesFromFile(armorTypeLines);
+
             // prints title
             Console.WriteLine("MONSTER MANUAL\n");
 
@@ -34,11 +42,15 @@ namespace MonsterManual
                 {
                     // prints instruction
                     Console.WriteLine("Enter a query to search monsters by name:");
+                    // input to search by
                     queryInput = Console.ReadLine();
+                    // for every monster 
                     foreach (MonsterType monster in allMonsterTypes)
                     {
+                        // if name contains query
                         if (monster.name.Contains(queryInput, StringComparison.CurrentCultureIgnoreCase))
                         {
+                            // add monster to query results
                             queryResults.Add(monster);
                         }
                     }
@@ -50,6 +62,7 @@ namespace MonsterManual
                     Console.WriteLine("\nWhich armor type do you want to display?\n");
                     // stores all values in armor type enum
                     ArmorTypeId[] armorTypeValues = Enum.GetValues<ArmorTypeId>();
+                    // display all possible choices
                     for (var i = 0; i < armorTypeValues.Length; i++)
                     {
                         Console.WriteLine($"{i + 1}: {armorTypeValues[i]}");
@@ -69,8 +82,6 @@ namespace MonsterManual
                             // add monster to query results
                             queryResults.Add(monster);
                         }
-
-
                     }
                 }
                 // if no results, run loop again
@@ -87,7 +98,8 @@ namespace MonsterManual
             {
                 //print sentence and monster data to console
                 Console.WriteLine($"\nDisplaying information for {queryResults[0].name}\n");
-                queryResults[0].PrintMonsterData();
+                PrintMonsterData(queryResults[0], armorTypes);
+
             }
             // if more than 1 result
             else
@@ -111,26 +123,124 @@ namespace MonsterManual
 
                 //print sentence and monster data to console
                 Console.WriteLine($"\nDisplaying information for {queryResults[numberInputAsIndex].name}\n");
-                queryResults[numberInputAsIndex].PrintMonsterData();
+                PrintMonsterData(queryResults[numberInputAsIndex], armorTypes);
             }
 
             // to keep console open
             Console.ReadLine();
         }
-
-        // functions to display all monster data
-        static void DisplayAllMonsterData(List<MonsterType> list)
+        // prints singular monsterdata
+        static void PrintMonsterData(MonsterType monster, Dictionary<ArmorTypeId, ArmorType> armorTypes)
         {
-            // for every element in list
-            foreach (MonsterType monsterType in list)
+            //prints name
+            Console.WriteLine($"Name: {monster.name}");
+            //prints description
+            Console.WriteLine($"Description: {monster.description}");
+            //prints alignment
+            Console.WriteLine($"Alignment: {monster.alignment}");
+            //prints hp roll
+            Console.WriteLine($"Hit points roll: {monster.hpRoll}");
+            Console.WriteLine($"Armor class: {monster.armorClass}");
+
+            // if the monsters armor types is of a specific category
+            if (armorTypes.TryGetValue(monster.armorType, out ArmorType value))
             {
-                // print monster data
-                monsterType.PrintMonsterData();
-                //spacing 
-                Console.WriteLine();
+                //prints armor type
+                Console.WriteLine($"Armor type: {value.DisplayName}");
+                // prints armor category
+                Console.WriteLine($"Armor category: {value.Category}");
+                // prints armor weight
+                Console.WriteLine($"Armor weight: {value.Weight} lb");
+            }
+            else
+            {
+                //prints armor type
+                Console.WriteLine($"Armor type: {monster.armorType}");
             }
         }
 
+        // function to generate all armor types from file
+        static Dictionary<ArmorTypeId, ArmorType> GenerateAllArmorTypesFromFile(string[] readFile)
+        {
+            // dictionary
+            Dictionary<ArmorTypeId, ArmorType> dict = [];
+
+            // goes through file, line by line
+            foreach (string line in readFile)
+            {
+                //temp variables
+                string displayName = string.Empty;
+                ArmorCategory armorCategory = ArmorCategory.Light;
+                int weight = 0;
+                ArmorTypeId key = ArmorTypeId.Unspecified;
+                // splits string by ',' to access comma separated values
+                string[] lineParts = line.Split(',');
+                // for every comma separated value per line
+                for (int i = 0; i < lineParts.Length; i++)
+                {
+                    // if index 0
+                    if (i == 0)
+                    {
+                        // set key to armortypeid based on string
+                        switch (lineParts[i])
+                        {
+                            case "Leather":
+                                key = ArmorTypeId.Leather;
+                                break;
+                            case "StuddedLeather":
+                                key = ArmorTypeId.StuddedLeather;
+                                break;
+                            case "Hide":
+                                key = ArmorTypeId.Hide;
+                                break;
+                            case "ChainShirt":
+                                key = ArmorTypeId.ChainShirt;
+                                break;
+                            case "ChainMail":
+                                key = ArmorTypeId.ChainMail;
+                                break;
+                            case "ScaleMail":
+                                key = ArmorTypeId.ScaleMail;
+                                break;
+                            case "Plate":
+                                key = ArmorTypeId.Plate;
+                                break;
+                        }
+                    }
+                    // if index 1 set display name
+                    if (i == 1)
+                    {
+                        displayName = lineParts[i];
+                    }
+                    // if index 2 set armor category based on string
+                    if (i == 2)
+                    {
+                        switch (lineParts[i])
+                        {
+                            case "Light":
+                                armorCategory = ArmorCategory.Light;
+                                break;
+                            case "Medium":
+                                armorCategory = ArmorCategory.Medium;
+                                break;
+                            case "Heavy":
+                                armorCategory = ArmorCategory.Heavy;
+                                break;
+                        }
+                    }
+                    // if index 3 set weight
+                    if (i == 3)
+                    {
+                        weight = int.Parse(lineParts[i]);
+                    }
+                }
+
+                // add Key and Value to dictionary, create ArmorType
+                dict.Add(key, new ArmorType(displayName, armorCategory, weight));
+            }
+            //return dict
+            return dict;
+        }
         // function to generate all monster types from file
         static List<MonsterType> GenerateMonstersFromFile(string[] readFile)
         {
@@ -220,35 +330,35 @@ namespace MonsterManual
                         switch (armorTypeParts[0].ToLower())
                         {
                             // to natural armor
-                            case ("natural armor"):
+                            case "natural armor":
                                 currentArmorType = ArmorTypeId.Natural;
                                 break;
                             // to leather armor
-                            case ("leather"):
+                            case "leather":
                                 currentArmorType = ArmorTypeId.Leather;
                                 break;
                             // to studded leather
-                            case ("studded leather"):
+                            case "studded leather":
                                 currentArmorType = ArmorTypeId.StuddedLeather;
                                 break;
                             // to hide
-                            case ("hide"):
+                            case "hide":
                                 currentArmorType = ArmorTypeId.Hide;
                                 break;
                             // to chain shirt
-                            case ("chain shirt"):
+                            case "chain shirt":
                                 currentArmorType = ArmorTypeId.ChainShirt;
                                 break;
                             // to chain mail
-                            case ("chain mail"):
+                            case "chain mail":
                                 currentArmorType = ArmorTypeId.ChainMail;
                                 break;
                             // to scale mail
-                            case ("scale mail"):
+                            case "scale mail":
                                 currentArmorType = ArmorTypeId.ScaleMail;
                                 break;
                             // to plate
-                            case ("plate"):
+                            case "plate":
                                 currentArmorType = ArmorTypeId.Plate;
                                 break;
                             // to other if no cases are met
@@ -265,7 +375,6 @@ namespace MonsterManual
 
                     // set current armor class to value
                     currentArmorClass = match.Groups[1].Value;
-
                 }
 
                 //check if at the end of a monster

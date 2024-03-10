@@ -32,24 +32,5 @@
         public int armorClass = armorClass;
         //armor type
         public ArmorTypeId armorType = armorType;
-
-        // functions
-
-        // prints monsterdata
-        public void PrintMonsterData()
-        {
-            //prints name
-            Console.WriteLine($"Name: {name}");
-            //prints description
-            Console.WriteLine($"Description: {description}");
-            //prints alignment
-            Console.WriteLine($"Alignment: {alignment}");
-            //prints hp roll
-            Console.WriteLine($"Hit points roll: {hpRoll}");
-            //prints armor class
-            Console.WriteLine($"Armor class: {armorClass}");
-            //prints armor type
-            Console.WriteLine($"Armor type: {armorType}");
-        }
     }
 }
