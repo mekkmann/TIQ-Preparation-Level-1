@@ -48,7 +48,7 @@ namespace MonsterManual
                     foreach (MonsterType monster in allMonsterTypes)
                     {
                         // if name contains query
-                        if (monster.name.Contains(queryInput, StringComparison.CurrentCultureIgnoreCase))
+                        if (monster.Name.Contains(queryInput, StringComparison.CurrentCultureIgnoreCase))
                         {
                             // add monster to query results
                             queryResults.Add(monster);
@@ -77,7 +77,7 @@ namespace MonsterManual
                     foreach (MonsterType monster in allMonsterTypes)
                     {
                         // if the armor type is the armor type we chose to look for
-                        if (monster.armorType == chosenArmorType)
+                        if (monster.ArmorType == chosenArmorType)
                         {
                             // add monster to query results
                             queryResults.Add(monster);
@@ -97,8 +97,9 @@ namespace MonsterManual
             if (queryResults.Count == 1)
             {
                 //print sentence and monster data to console
-                Console.WriteLine($"\nDisplaying information for {queryResults[0].name}\n");
-                PrintMonsterData(queryResults[0], armorTypes);
+                Console.WriteLine($"\nDisplaying information for {queryResults[0].Name}\n");
+                queryResults[0].PrintMonsterData(armorTypes);
+                //PrintMonsterData(queryResults[0], armorTypes);
 
             }
             // if more than 1 result
@@ -110,7 +111,7 @@ namespace MonsterManual
                 // print all options
                 for (int i = 0; i < queryResults.Count; i++)
                 {
-                    Console.WriteLine($"{i + 1}: {queryResults[i].name}");
+                    Console.WriteLine($"{i + 1}: {queryResults[i].Name}");
                 }
 
                 // ask user for number
@@ -122,41 +123,12 @@ namespace MonsterManual
                 int numberInputAsIndex = int.Parse(numberInput) - 1;
 
                 //print sentence and monster data to console
-                Console.WriteLine($"\nDisplaying information for {queryResults[numberInputAsIndex].name}\n");
-                PrintMonsterData(queryResults[numberInputAsIndex], armorTypes);
+                Console.WriteLine($"\nDisplaying information for {queryResults[numberInputAsIndex].Name}\n");
+                queryResults[numberInputAsIndex].PrintMonsterData(armorTypes);
             }
 
             // to keep console open
             Console.ReadLine();
-        }
-        // prints singular monsterdata
-        static void PrintMonsterData(MonsterType monster, Dictionary<ArmorTypeId, ArmorType> armorTypes)
-        {
-            //prints name
-            Console.WriteLine($"Name: {monster.name}");
-            //prints description
-            Console.WriteLine($"Description: {monster.description}");
-            //prints alignment
-            Console.WriteLine($"Alignment: {monster.alignment}");
-            //prints hp roll
-            Console.WriteLine($"Hit points roll: {monster.hpRoll}");
-            Console.WriteLine($"Armor class: {monster.armorClass}");
-
-            // if the monsters armor types is of a specific category
-            if (armorTypes.TryGetValue(monster.armorType, out ArmorType value))
-            {
-                //prints armor type
-                Console.WriteLine($"Armor type: {value.DisplayName}");
-                // prints armor category
-                Console.WriteLine($"Armor category: {value.Category}");
-                // prints armor weight
-                Console.WriteLine($"Armor weight: {value.Weight} lb");
-            }
-            else
-            {
-                //prints armor type
-                Console.WriteLine($"Armor type: {monster.armorType}");
-            }
         }
 
         // function to generate all armor types from file
@@ -258,8 +230,6 @@ namespace MonsterManual
 
             // counter to keep track of if we're in a specific monster types block or at the next
             int monsterLineCounter = 0;
-            // track previousLine
-            string previousLine = string.Empty;
             // goes through the file, line by line
             foreach (string line in readFile)
             {
@@ -382,9 +352,6 @@ namespace MonsterManual
                 {
                     // reset counter to 0
                     monsterLineCounter = 0;
-
-                    // set previous line
-                    previousLine = line;
 
                     // create and add monster type to list
                     // creating the monster with the temp variables from before
