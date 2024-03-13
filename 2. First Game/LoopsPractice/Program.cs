@@ -73,10 +73,13 @@
         /// </summary>
         static void DrawParallelogram(int height)
         {
-            for (int i = height; i < 0; i--)
+            for (int i = 0; i < height; i++)
             {
-
-
+                string line = "";
+                int whitespaces = height - i;
+                for (int j = 0; j < whitespaces - 1; j++) line += " ";
+                for (int j = 0; j < height; j++) line += "#";
+                Console.WriteLine(line);
             }
         }
     }
