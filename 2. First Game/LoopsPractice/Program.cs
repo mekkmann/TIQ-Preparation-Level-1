@@ -6,20 +6,24 @@
         {
             int part1Value = 5;
 
-            //1.1
+            //1.2
             DrawLine(part1Value);
             //spacing
             Console.WriteLine("\n");
-            //1.2
+            //1.3
             DrawSquare(part1Value);
             //spacing
             Console.WriteLine("\n");
-            //1.3
+            //1.4
             DrawRightTriangle(part1Value);
             //spacing
             Console.WriteLine("\n");
-            //1.4
+            //1.5
             DrawParallelogram(part1Value);
+            //spacing
+            Console.WriteLine("\n");
+            //1.5
+            DrawIsoscelesTriangle(part1Value);
             //spacing
             Console.WriteLine("\n");
 
@@ -81,6 +85,12 @@
                 for (int j = 0; j < height; j++) line += "#";
                 Console.WriteLine(line);
             }
+        }
+        /// <summary>
+        /// Draw an Isosceles triangle with height n and base 2n-1.
+        /// </summary>
+        static void DrawIsoscelesTriangle(int height)
+        {
         }
     }
 }
