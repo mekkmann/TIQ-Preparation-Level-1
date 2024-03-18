@@ -6,7 +6,7 @@ namespace AdventureMap
     {
         static void Main(string[] args)
         {
-            Map(75, 20, "Adventure Map");
+            Map(750, 20, "Adventure Map");
             //Map(60, 20, "Adventure Map");
             //Map(40, 20, "Adventure Map");
             //Map(20, 20, "Adventure Map");
@@ -18,6 +18,10 @@ namespace AdventureMap
 
             static void Map(int width, int height, string title)
             {
+                if (Console.BufferWidth < width)
+                {
+                    width = Console.BufferWidth;
+                }
                 Random random = new();
 
                 //Helper Variables
